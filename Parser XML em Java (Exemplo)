@@ -1,0 +1,128 @@
+    /*
+     DOM é uma interface de programação, baseada no modelo de objetos,
+       que permite a manipulação e transformação de documentos em XML.
+       A interface DOM manipula documentos XML na forma de uma estrutura em árvore.
+       Quando um documento é carregado na memória do computador,
+       suas estruturas podem ser lidas e manipuladas através do objeto DOM.
+
+       interface DOM faz a representação do documento XML na forma
+       de uma árvore de objetos, onde cada nó da árvore representa um component
+       do documento. 
+       Após o processamento completo do documento XML, a memória deverá conter
+       a árvore de objetos DOM, a qual disponibiliza para as aplicações qualquer
+       informação relacionada à estrutura e ao conteúdo do documento.
+
+       fonte desta descrição:
+    https://loiane.com/2009/04/manipulando-arquivos-xml-em-java-com-a-api-dom-parte-i/
+
+    */
+
+    package xmldom;
+
+    import java.io.IOException;
+    import java.util.logging.Level;
+    import java.util.logging.Logger;
+
+    import javax.xml.parsers.DocumentBuilder;
+    import javax.xml.parsers.DocumentBuilderFactory;
+    import javax.xml.parsers.ParserConfigurationException;
+
+    import org.w3c.dom.Document;
+    import org.w3c.dom.Element;
+    import org.w3c.dom.Node;
+    import org.w3c.dom.NodeList;
+    import org.xml.sax.SAXException;
+
+    /**
+     *
+     * @author johabe.marques
+     */
+    public class XMLDom {
+
+        /**
+         * @param args the command line arguments
+         */
+        public static void main(String[] args) {
+
+            try {
+                //objetos para construir e fazer a leitura do documento
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder builder = factory.newDocumentBuilder();
+
+                //abre e faz o parser de um documento xml de acordo com o nome passado no parametro
+                Document doc = builder.parse("C:\\Users\\Johabe\\Desktop\\PrograminhasXMLDom\\pessoa.xml");
+
+                //cria uma lista de pessoas. Busca no documento todas as tag pessoa
+                NodeList listaDePessoas = doc.getElementsByTagName("pessoa");
+
+                //pego o tamanho da lista de pessoas
+                int tamanhoLista = listaDePessoas.getLength();
+
+                //varredura na lista de pessoas
+                for (int i = 0; i < tamanhoLista; i++) {
+
+                    //pego cada item (pessoa) como um nó (node)
+                    Node noPessoa = listaDePessoas.item(i);
+
+                    //verifica se o noPessoa é do tipo element (e não do tipo texto etc)
+                    if(noPessoa.getNodeType() == Node.ELEMENT_NODE){
+
+                        //caso seja um element, converto o no Pessoa em Element pessoa
+                        Element elementoPessoa = (Element) noPessoa;
+
+                        //já posso pegar o atributo do element
+                        String id = elementoPessoa.getAttribute("id");
+
+                        //imprimindo o id
+                        System.out.println("ID = " + id);      
+
+                        //recupero os nos filhos do elemento pessoa (nome, idade e peso)
+                        NodeList listaDeFilhosDaPessoa = elementoPessoa.getChildNodes();
+
+                        //pego o tamanho da lista de filhos do elemento pessoa
+                        int tamanhoListaFilhos = listaDeFilhosDaPessoa.getLength();
+
+                        //varredura na lista de filhos do elemento pessoa
+                        for (int j = 0; j < tamanhoListaFilhos; j++) {
+
+                            //crio um no com o cada tag filho dentro do no pessoa (tag nome, idade e peso)
+                            Node noFilho = listaDeFilhosDaPessoa.item(j);
+
+                            //verifico se são tipo element
+                            if(noFilho.getNodeType() == Node.ELEMENT_NODE){
+
+                                //converto o no filho em element filho
+                                Element elementoFilho = (Element) noFilho;
+
+                                //verifico em qual filho estamos pela tag
+                                switch(elementoFilho.getTagName()){
+                                    case "nome":
+                                        //imprimo o nome
+                                        System.out.println("NOME=" + elementoFilho.getTextContent());
+                                        break;
+
+                                    case "idade":
+                                        //imprimo a idade
+                                        System.out.println("IDADE=" + elementoFilho.getTextContent());
+                                        break;
+
+                                    case "peso":
+                                        //imprimo o peso
+                                        System.out.println("PESO=" + elementoFilho.getTextContent());
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+            } catch (ParserConfigurationException ex) {
+                Logger.getLogger(XMLDom.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SAXException ex) {
+                Logger.getLogger(XMLDom.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(XMLDom.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+    }
